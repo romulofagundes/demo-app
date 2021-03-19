@@ -1,0 +1,21 @@
+version: '3.1'
+services:
+  postgresql-server:
+    container_name: postgresql-server
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_PASSWORD: demoapp
+      POSTGRES_USER: demoapp
+    ports:
+    - "5432:5432"
+  demo-app:
+    container_name: demo-app
+    build: .
+    environment:
+      POSTGRESQL_URL: jdbc:postgresql://postgresql-server/demoapp
+      POSTGRESQL_USERNAME: demoapp
+      POSTGRESQL_PASSWORD: demoapp
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgresql-server
