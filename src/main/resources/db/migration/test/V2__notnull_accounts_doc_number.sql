@@ -1,0 +1,1 @@
+ALTER TABLE accounts ALTER COLUMN document_number SET NOT NULL;
