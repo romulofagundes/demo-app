@@ -1,0 +1,23 @@
+server:
+  error:
+    include-message: always
+spring:
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
+  jpa:
+    show-sql: false
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: none
+  flyway:
+    locations: classpath:/db/migration/test
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    user: sa
+    password: sa
+    baselineOnMigrate: true
