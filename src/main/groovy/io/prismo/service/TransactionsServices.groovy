@@ -1,6 +1,11 @@
 package io.prismo.service
 
 import io.prismo.domain.Transactions
+import io.prismo.dto.TransactionsDTO
+import io.prismo.exception.InvalidAccountException
+import io.prismo.exception.InvalidOperationalTypesException
+import io.prismo.repos.AccountsRepository
+import io.prismo.repos.OperationalTypesRepository
 import io.prismo.repos.TransactionsRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -11,7 +16,30 @@ class TransactionsServices {
     @Autowired
     TransactionsRepository transactionsRepository
 
-    Transactions create(Transactions transactions){
-        return transactionsRepository.save(transactions)
+    @Autowired
+    AccountsRepository accountsRepository
+
+    @Autowired
+    OperationalTypesRepository operationalTypesRepository
+
+    TransactionsDTO create(TransactionsDTO transactionsDTO){
+        def transactions = new Transactions()
+        transactions.accounts = accountsRepository
+                .findById(transactionsDTO.accountId)
+                .orElseThrow{new InvalidAccountException()}
+        transactions.operationalTypes = operationalTypesRepository
+                .findById(transactionsDTO.operationTypeId)
+                .orElseThrow{new InvalidOperationalTypesException()}
+
+        if([1l,2l,3l].contains(transactionsDTO.operationTypeId)){
+            transactionsDTO.amount *= -1
+        }
+        transactions.amount = transactionsDTO.amount
+        transactionsRepository.save(transactions)
+
+        transactionsDTO.id = transactions.id
+        transactionsDTO.eventDate = transactions.eventDate
+
+        return transactionsDTO
     }
 }
