@@ -23,7 +23,7 @@ class Accounts {
     @JsonProperty("account_id")
     Long id
 
-    @Column(name="document_number")
-    @JsonProperty("document_number")
+    @Column(name="document_number",nullable = false)
+    @JsonProperty(value="document_number",required = true)
     String documentNumber
 }

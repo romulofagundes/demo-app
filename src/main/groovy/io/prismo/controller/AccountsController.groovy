@@ -22,6 +22,9 @@ class AccountsController {
 
     @PostMapping
     ResponseEntity<Accounts> create(@RequestBody Accounts accounts){
+        if(!accounts.documentNumber){
+            return ResponseEntity.badRequest().build()
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(accountsService.create(accounts))
     }
 
