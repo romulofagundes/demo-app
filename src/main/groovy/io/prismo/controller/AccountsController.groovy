@@ -4,6 +4,7 @@ import io.prismo.domain.Accounts
 import io.prismo.exception.AccountsNotFoundException
 import io.prismo.service.AccountsService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -21,7 +22,7 @@ class AccountsController {
 
     @PostMapping
     ResponseEntity<Accounts> create(@RequestBody Accounts accounts){
-        return ResponseEntity.ok(accountsService.create(accounts))
+        return ResponseEntity.status(HttpStatus.CREATED).body(accountsService.create(accounts))
     }
 
     @GetMapping("/{id}")
