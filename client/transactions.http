@@ -6,3 +6,9 @@ Content-Type: application/json
   "operation_type_id": 2,
   "amount": 123.45
 }
+
+###
+POST http://localhost:8080/transactions
+Content-Type: application/json
+
+{}

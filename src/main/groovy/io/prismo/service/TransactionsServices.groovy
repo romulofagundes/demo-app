@@ -4,6 +4,8 @@ import io.prismo.domain.Transactions
 import io.prismo.dto.TransactionsDTO
 import io.prismo.exception.InvalidAccountException
 import io.prismo.exception.InvalidOperationalTypesException
+import io.prismo.exception.TransactionsAmountWithNoFunds
+import io.prismo.exception.TransactionsEmptyValuesException
 import io.prismo.repos.AccountsRepository
 import io.prismo.repos.OperationalTypesRepository
 import io.prismo.repos.TransactionsRepository
@@ -22,16 +24,25 @@ class TransactionsServices {
     @Autowired
     OperationalTypesRepository operationalTypesRepository
 
-    TransactionsDTO create(TransactionsDTO transactionsDTO){
+    TransactionsDTO create(TransactionsDTO transactionsDTO) {
+        if (transactionsDTO.amount == null
+                && transactionsDTO.accountId == null
+                && transactionsDTO.operationTypeId == null
+        ) {
+            throw new TransactionsEmptyValuesException()
+        }
         def transactions = new Transactions()
         transactions.accounts = accountsRepository
                 .findById(transactionsDTO.accountId)
-                .orElseThrow{new InvalidAccountException()}
+                .orElseThrow { new InvalidAccountException() }
         transactions.operationalTypes = operationalTypesRepository
                 .findById(transactionsDTO.operationTypeId)
-                .orElseThrow{new InvalidOperationalTypesException()}
+                .orElseThrow { new InvalidOperationalTypesException() }
 
-        if([1l,2l,3l].contains(transactionsDTO.operationTypeId)){
+        if (transactionsDTO.amount <= 0) {
+            throw new TransactionsAmountWithNoFunds()
+        }
+        if ([1l, 2l, 3l].contains(transactionsDTO.operationTypeId)) {
             transactionsDTO.amount *= -1
         }
         transactions.amount = transactionsDTO.amount
