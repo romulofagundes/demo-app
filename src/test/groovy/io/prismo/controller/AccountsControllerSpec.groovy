@@ -34,7 +34,7 @@ class AccountsControllerSpec extends Specification{
 
     @Test
     def "validando se o numero do documento esta de acordo com o enviado"(){
-        given: "criando o Objeto Accounts"
+        given: "criando o objeto accounts"
         def account = new Accounts(documentNumber: "12345678900")
 
         when: "realiza o envio do account"
@@ -60,6 +60,9 @@ class AccountsControllerSpec extends Specification{
                         .content("{}")).andReturn().response
         then: "validando retorno e documento com erro"
         response.status == HttpStatus.BAD_REQUEST.value()
+
+        and:
+        response.errorMessage == "Document Number is Required"
     }
 
     @Test
