@@ -1,6 +1,7 @@
 package io.prismo.controller
 
 import io.prismo.domain.Accounts
+import io.prismo.exception.AccountsNotFoundException
 import io.prismo.service.AccountsService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -23,8 +24,9 @@ class AccountsController {
         return ResponseEntity.ok(accountsService.create(accounts))
     }
 
-    @GetMapping("/:id")
+    @GetMapping("/{id}")
     ResponseEntity<Accounts> get(@PathVariable("id") Long id){
-        return
+        Accounts returned = accountsService.get(id).orElseThrow{new AccountsNotFoundException()}
+        return ResponseEntity.ok(returned)
     }
 }

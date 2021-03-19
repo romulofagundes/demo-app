@@ -1,6 +1,8 @@
 package io.prismo.controller
 
-import io.prismo.domain.Transactions
+import io.prismo.dto.TransactionsDTO
+import io.prismo.service.TransactionsServices
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -11,9 +13,12 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/transactions")
 class TransactionsController {
 
-    @PostMapping
-    ResponseEntity<Transactions> create(@RequestBody Transactions transactions){
+    @Autowired
+    TransactionsServices transactionsServices
 
+    @PostMapping
+    ResponseEntity<TransactionsDTO> create(@RequestBody TransactionsDTO transactionsDTO){
+        return ResponseEntity.ok(transactionsServices.create(transactionsDTO))
     }
 
 }
