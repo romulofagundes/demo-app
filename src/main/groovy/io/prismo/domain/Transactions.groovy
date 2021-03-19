@@ -1,6 +1,8 @@
 package io.prismo.domain
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import groovy.transform.EqualsAndHashCode
+import groovy.transform.ToString
 
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -15,27 +17,29 @@ import javax.persistence.Table
 
 @Entity
 @Table
+@ToString(includePackage = false,includeNames = true)
+@EqualsAndHashCode
 class Transactions {
 
     @Id
-    @Column(name="Transaction_ID")
-    @JsonProperty("Transaction_ID")
+    @Column(name="transaction_id")
+    @JsonProperty("transaction_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="Account_ID",nullable = false)
+    @JoinColumn(name="account_id",nullable = false)
     Accounts accounts
 
     @OneToOne
-    @JoinColumn(name="OperationType_ID",nullable = false)
+    @JoinColumn(name="operationtype_id",nullable = false)
     OperationalTypes operationalTypes
 
-    @Column(name="Amount")
-    @JsonProperty("Amount")
+    @Column(name="amount")
+    @JsonProperty("amount")
     BigDecimal amount
 
-    @Column(name="EventDate",insertable = false, updatable = false)
-    @JsonProperty("EventDate")
+    @Column(name="eventdate",insertable = false, updatable = false)
+    @JsonProperty("eventdate")
     Date eventDate = new Date()
 }
