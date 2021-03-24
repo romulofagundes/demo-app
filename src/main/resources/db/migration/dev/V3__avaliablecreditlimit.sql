@@ -1,0 +1,1 @@
+ALTER TABLE accounts ADD COLUMN available_limit_credit numeric(19,2) NOT NULL DEFAULT 500;

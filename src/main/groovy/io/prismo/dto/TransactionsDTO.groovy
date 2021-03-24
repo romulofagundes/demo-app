@@ -16,6 +16,8 @@ class TransactionsDTO {
     @JsonProperty(value = "amount", required = true)
     BigDecimal amount
 
+
+
     @JsonProperty("eventdate")
     Date eventDate
 }

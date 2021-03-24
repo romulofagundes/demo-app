@@ -26,4 +26,9 @@ class Accounts {
     @Column(name="document_number",nullable = false)
     @JsonProperty(value="document_number",required = true)
     String documentNumber
+
+
+    @Column(name="available_limit_credit",nullable = false)
+    @JsonProperty(value="available_limit_credit")
+    BigDecimal availableLimitCredit = 500
 }
