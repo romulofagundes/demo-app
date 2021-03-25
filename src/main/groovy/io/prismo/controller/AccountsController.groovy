@@ -27,7 +27,7 @@ class AccountsController {
 
     @GetMapping("/{id}")
     ResponseEntity<Accounts> get(@PathVariable("id") Long id){
-        Accounts returned = accountsService.get(id).orElseThrow{new AccountsNotFoundException()}
+        Accounts returned = accountsService.get(id)
         return ResponseEntity.ok(returned)
     }
 }

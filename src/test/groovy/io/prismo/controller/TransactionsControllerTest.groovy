@@ -31,7 +31,7 @@ class TransactionsControllerTest extends GeneralTest{
 
     @BeforeEach
     void setup(){
-        accounts = accountsService.create(new Accounts(documentNumber: "12345678900"))
+        accounts = accountsService.create(new Accounts(documentNumber: UUID.randomUUID().toString()))
     }
 
     @Test
@@ -73,7 +73,7 @@ class TransactionsControllerTest extends GeneralTest{
                 .andReturn().response
         TransactionsDTO trasactionasDTORetorno = objectMapper.readerFor(TransactionsDTO.class).readValue(response.contentAsString)
         assertNotNull(trasactionasDTORetorno.id)
-        assertTrue(trasactionasDTORetorno.amount <= 0)
+        assertTrue(trasactionasDTORetorno.amount < 0)
         assertEquals(trasactionasDTORetorno.amount,transactionsDTO.amount * -1)
     }
 
@@ -133,10 +133,9 @@ class TransactionsControllerTest extends GeneralTest{
         def transactionsDTO = new TransactionsDTO(
                 accountId: accounts.id,
                 operationTypeId: -1,
-                amount: new BigDecimal(0)
+                amount: new BigDecimal(10)
         )
 
-        when: "realizando o envio do transactionsDTO"
         def response = mvc.perform(
                 post("/transactions")
                         .contentType(MediaType.APPLICATION_JSON)

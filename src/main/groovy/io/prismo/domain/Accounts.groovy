@@ -17,6 +17,8 @@ import javax.persistence.Table
 @EqualsAndHashCode
 class Accounts {
 
+    public static BigDecimal INITIAL_CREDIT_LIMIT = new BigDecimal("500")
+
     @Id
     @Column(name="account_id")
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -30,5 +32,5 @@ class Accounts {
 
     @Column(name="available_limit_credit",nullable = false)
     @JsonProperty(value="available_limit_credit")
-    BigDecimal availableLimitCredit = 500
+    BigDecimal availableLimitCredit = INITIAL_CREDIT_LIMIT
 }

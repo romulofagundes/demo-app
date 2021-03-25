@@ -28,7 +28,7 @@ class AccountsControllerTest extends GeneralTest{
 
     @Test
     void account_CreateWithDocumentNumber(){
-        def account = new Accounts(documentNumber: "12345678900")
+        def account = new Accounts(documentNumber: UUID.randomUUID().toString())
 
         def response = mvc.perform(
                 post("/accounts")
@@ -58,7 +58,7 @@ class AccountsControllerTest extends GeneralTest{
 
     @Test
     void account_CreateAccountInServiceAndRecoveredByRest(){
-        def account = accountsService.create(new Accounts(documentNumber: "00987654321"))
+        def account = accountsService.create(new Accounts(documentNumber: UUID.randomUUID().toString()))
 
         def response = mvc.perform(get("/accounts/${account.id}"))
                 .andExpect(status().isOk())

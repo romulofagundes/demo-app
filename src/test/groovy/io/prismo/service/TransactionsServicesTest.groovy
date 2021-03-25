@@ -2,8 +2,9 @@ package io.prismo.service
 
 import io.prismo.domain.Accounts
 import io.prismo.dto.TransactionsDTO
+import io.prismo.exception.AccountsNotFoundException
 import io.prismo.exception.AccountsWithoutCreditLimitException
-import io.prismo.exception.InvalidAccountException
+
 import io.prismo.exception.InvalidOperationalTypesException
 import io.prismo.exception.TransactionsAmountWithNoFunds
 import io.prismo.exception.TransactionsEmptyValuesException
@@ -26,7 +27,7 @@ class TransactionsServicesTest extends GeneralTest {
 
     @BeforeEach
     void setup() {
-        accounts = accountsService.create(new Accounts(documentNumber: "12345678900"))
+        accounts = accountsService.create(new Accounts(documentNumber: UUID.randomUUID().toString()))
     }
 
     @Test
@@ -46,8 +47,9 @@ class TransactionsServicesTest extends GeneralTest {
 
     @Test
     void transactions_TestValidCreateWithNegativeOperation() {
+        def accountNew = accountsService.create(new Accounts(documentNumber: UUID.randomUUID().toString()))
         def transactionsDTO = new TransactionsDTO(
-                accountId: accounts.id,
+                accountId: accountNew.id,
                 operationTypeId: 1,
                 amount: new BigDecimal(10)
         )
@@ -66,7 +68,7 @@ class TransactionsServicesTest extends GeneralTest {
                 operationTypeId: 4,
                 amount: new BigDecimal(10)
         )
-        assertThrows(InvalidAccountException.class, { transactionsServices.create(transactionsDTO) })
+        assertThrows(AccountsNotFoundException.class, { transactionsServices.create(transactionsDTO) })
     }
 
     @Test
@@ -108,40 +110,40 @@ class TransactionsServicesTest extends GeneralTest {
 
     @Test
     void transactions_TestAccountWithPlusCreditLimit() {
-        def accountNew = accountsService.create(new Accounts(documentNumber: "12345678999"))
-
+        def accountNew = accountsService.create(new Accounts(documentNumber: UUID.randomUUID().toString()))
+        def amountTest = new BigDecimal("10.00")
         def transactionsDTO = new TransactionsDTO(
                 accountId: accountNew.id,
                 operationTypeId: 4,
-                amount: new BigDecimal(10)
+                amount: amountTest
         )
         transactionsServices.create(transactionsDTO)
-        def accountRecovery = accountsService.get(accountNew.id).get()
-        assertEquals(accountRecovery.availableLimitCredit, new BigDecimal("510.00"))
+        def accountRecovery = accountsService.get(accountNew.id)
+        assertEquals(accountRecovery.availableLimitCredit, (Accounts.INITIAL_CREDIT_LIMIT+amountTest))
     }
 
     @Test
     void transactions_TestAccountWithMinusCreditLimit() {
-        def accountNew = accountsService.create(new Accounts(documentNumber: "12345678998"))
-
+        def accountNew = accountsService.create(new Accounts(documentNumber: UUID.randomUUID().toString()))
+        def amountTest = new BigDecimal("10.00")
         def transactionsDTO = new TransactionsDTO(
                 accountId: accountNew.id,
                 operationTypeId: 2,
-                amount: new BigDecimal(10)
+                amount: amountTest
         )
         transactionsServices.create(transactionsDTO)
-        def accountRecovery = accountsService.get(accountNew.id).get()
-        assertEquals(accountRecovery.availableLimitCredit, new BigDecimal("490.00"))
+        def accountRecovery = accountsService.get(accountNew.id)
+        assertEquals(accountRecovery.availableLimitCredit, (Accounts.INITIAL_CREDIT_LIMIT-amountTest))
     }
 
     @Test
     void transactions_TestAccountWithMinusWithouLimitCredit() {
-        def accountNew = accountsService.create(new Accounts(documentNumber: "12345678799"))
-
+        def accountNew = accountsService.create(new Accounts(documentNumber: UUID.randomUUID().toString()))
+        def amountTest = Accounts.INITIAL_CREDIT_LIMIT + 1
         def transactionsDTO = new TransactionsDTO(
                 accountId: accountNew.id,
                 operationTypeId: 2,
-                amount: new BigDecimal(510)
+                amount: amountTest
         )
         assertThrows(AccountsWithoutCreditLimitException.class, { transactionsServices.create(transactionsDTO) })
 

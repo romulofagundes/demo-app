@@ -2,13 +2,8 @@ package io.prismo.service
 
 import io.prismo.domain.Transactions
 import io.prismo.dto.TransactionsDTO
-import io.prismo.exception.AccountsWithoutCreditLimitException
-import io.prismo.exception.InvalidAccountException
-import io.prismo.exception.InvalidOperationalTypesException
 import io.prismo.exception.TransactionsAmountWithNoFunds
 import io.prismo.exception.TransactionsEmptyValuesException
-import io.prismo.repos.AccountsRepository
-import io.prismo.repos.OperationalTypesRepository
 import io.prismo.repos.TransactionsRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -22,10 +17,10 @@ class TransactionsServices {
     TransactionsRepository transactionsRepository
 
     @Autowired
-    AccountsRepository accountsRepository
+    AccountsService accountsService
 
     @Autowired
-    OperationalTypesRepository operationalTypesRepository
+    OperationalTypesService operationalTypesService
 
     @Transactional
     TransactionsDTO create(TransactionsDTO transactionsDTO) {
@@ -39,31 +34,28 @@ class TransactionsServices {
             throw new TransactionsAmountWithNoFunds()
         }
 
-        def accounts = accountsRepository
-                .findById(transactionsDTO.accountId)
-                .orElseThrow { new InvalidAccountException() }
-
-        def operationalTypes = operationalTypesRepository
-                .findById(transactionsDTO.operationTypeId)
-                .orElseThrow { new InvalidOperationalTypesException() }
-
+        def accounts = accountsService.get(transactionsDTO.accountId)
+        def operationalTypes = operationalTypesService.get(transactionsDTO.operationTypeId)
 
         def transactions = new Transactions(accounts: accounts, operationalTypes: operationalTypes)
 
-        if ([1l, 2l, 3l].contains(transactionsDTO.operationTypeId)) {
-            transactionsDTO.amount *= -1
-        }
-        transactions.accounts.availableLimitCredit += transactionsDTO.amount
-        if (transactions.accounts.availableLimitCredit < 0) {
-            throw new AccountsWithoutCreditLimitException()
-        }
-        transactions.amount = transactionsDTO.amount
+        def calculatedValue = calcValue(transactionsDTO.operationTypeId, transactionsDTO.amount)
+        accountsService.debitValue(accounts, calculatedValue)
+        transactions.amount = calculatedValue
+        transactionsDTO.amount = calculatedValue
         transactionsRepository.save(transactions)
-
         transactionsDTO.id = transactions.id
         transactionsDTO.eventDate = transactions.eventDate
 
         return transactionsDTO
+    }
+
+    private BigDecimal calcValue(Long operationTypeId, BigDecimal amount) {
+        def returnedAmount = amount
+        if ([1l, 2l, 3l].contains(operationTypeId)) {
+            returnedAmount *= -1
+        }
+        return returnedAmount
     }
 
 }

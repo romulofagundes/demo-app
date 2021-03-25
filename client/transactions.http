@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "account_id": 1,
   "operation_type_id": 2,
-  "amount": 1
+  "amount": 10
 }
 
 

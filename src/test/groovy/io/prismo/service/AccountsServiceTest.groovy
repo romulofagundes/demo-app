@@ -1,6 +1,7 @@
 package io.prismo.service
 
 import io.prismo.domain.Accounts
+import io.prismo.exception.AccountsNotFoundException
 import io.prismo.exception.AccountsWithoutDocumentNumberException
 import io.prismo.test.GeneralTest
 import org.junit.jupiter.api.Test
@@ -15,7 +16,7 @@ class AccountsServiceTest extends GeneralTest{
 
     @Test
     void accounts_TestValidCreate() {
-        Accounts accounts = new Accounts(documentNumber: "12345678900")
+        Accounts accounts = new Accounts(documentNumber: UUID.randomUUID().toString())
         Accounts accountsCreated = accountsService.create(accounts)
         assertEquals(accountsCreated.documentNumber, accounts.documentNumber)
         assertTrue(accountsCreated.id > 0)
@@ -31,15 +32,15 @@ class AccountsServiceTest extends GeneralTest{
 
     @Test
     void accounts_CreateAndRecoveryById() {
-        Accounts accountsCreated = accountsService.create(new Accounts(documentNumber: "12345678900"))
-        Optional<Accounts> accountsRecovery = accountsService.get(accountsCreated.id)
-        assertEquals(accountsCreated.id, accountsRecovery.get().id)
-        assertEquals(accountsCreated.documentNumber, accountsRecovery.get().documentNumber)
+        Accounts accountsCreated = accountsService.create(new Accounts(documentNumber: UUID.randomUUID().toString()))
+        Accounts accountsRecovery = accountsService.get(accountsCreated.id)
+        assertEquals(accountsCreated.id, accountsRecovery.id)
+        assertEquals(accountsCreated.documentNumber, accountsRecovery.documentNumber)
     }
 
     @Test
     void accounts_RecoveryByIdInvalid() {
-        assertThrows(NoSuchElementException, { accountsService.get(Integer.MAX_VALUE).get() })
+        assertThrows(AccountsNotFoundException, { accountsService.get(Integer.MAX_VALUE) })
 
     }
 }
