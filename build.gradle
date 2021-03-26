@@ -4,7 +4,7 @@ plugins {
 	id 'groovy'
 }
 
-group = 'io.prismo'
+group = 'io.pismo'
 sourceCompatibility = '11'
 
 repositories {
